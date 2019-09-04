@@ -4,8 +4,7 @@ import {Query} from 'react-apollo'
 import RestaurantCard from './restaurant-card'
 const RESTAURANTS_QUERY = gql`
   query RestaurantsQuery {
-    totals {
-      total
+    AllBusinesses {
       businesses {
         id
         price
@@ -23,7 +22,7 @@ export default class Restaurants extends Component {
               if (loading) return <h2>loading</h2>
               if (error) console.log(error)
               console.log(data)
-              return data.totals.businesses.map(business => (
+              return data.AllBusinesses.businesses.map(business => (
                 <RestaurantCard {...business} />
               ))
             }}

@@ -7,7 +7,7 @@ const {
 } = require('graphql')
 const axios = require('axios')
 const RestaurantType = new GraphQLObjectType({
-  name: 'Business',
+  name: 'Restaurant',
   fields: () => ({
     price: {type: GraphQLString},
     id: {type: GraphQLString},
@@ -15,10 +15,9 @@ const RestaurantType = new GraphQLObjectType({
   })
 })
 
-const TotalType = new GraphQLObjectType({
-  name: 'Total',
+const AllBusinessType = new GraphQLObjectType({
+  name: 'Business',
   fields: () => ({
-    total: {type: GraphQLInt},
     businesses: {type: new GraphQLList(RestaurantType)}
   })
 })
@@ -29,13 +28,13 @@ const apiKey =
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
-    totals: {
-      type: TotalType,
-      //   args: {price: {type: GraphQLString}},
+    AllBusinesses: {
+      type: AllBusinessType,
       async resolve(parent, args) {
         const {data} = await axios.get(url, {
           headers: {Authorization: `Bearer ${apiKey}`}
         })
+
         return data
       }
     }
