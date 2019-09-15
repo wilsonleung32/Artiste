@@ -2,10 +2,23 @@ import React, {useState} from 'react'
 
 const restaurantCard = props => {
   const [showCard, setShow] = useState(false)
-  return !showCard ? (
-    <div onClick={() => setShow(true)}>false</div>
-  ) : (
-    <div>{props.id}</div>
+  return (
+    <div>
+      {!showCard ? (
+        <button
+          type="button"
+          onClick={() => {
+            setShow(true)
+          }}
+        >
+          Reveal
+        </button>
+      ) : (
+        <div>
+          {props.price},{props.name}
+        </div>
+      )}
+    </div>
   )
 }
 

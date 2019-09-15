@@ -7,7 +7,6 @@ export default class Selection extends Component {
   render() {
     return (
       <ApolloProvider client={client}>
-        <div>HELLO</div>
         <Restaurants />
       </ApolloProvider>
     )

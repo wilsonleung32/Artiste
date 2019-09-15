@@ -3,15 +3,23 @@ const {
   GraphQLString,
   GraphQLSchema,
   GraphQLList,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLFloat
 } = require('graphql')
 const axios = require('axios')
+const CategoriesType = new GraphQLObjectType({
+  name: 'Categories',
+  fields: () => ({
+    title: {type: GraphQLString}
+  })
+})
 const RestaurantType = new GraphQLObjectType({
   name: 'Restaurant',
   fields: () => ({
     price: {type: GraphQLString},
     id: {type: GraphQLString},
-    name: {type: GraphQLString}
+    name: {type: GraphQLString},
+    categories: {type: new GraphQLList(CategoriesType)}
   })
 })
 
@@ -22,7 +30,7 @@ const AllBusinessType = new GraphQLObjectType({
   })
 })
 
-const url = 'https://api.yelp.com/v3/businesses/search?location=NYC&limit=3'
+let url = 'https://api.yelp.com/v3/businesses/search?categories=restaurants'
 const apiKey =
   '5GJE62_sw2xkLW9EQFAmb-BQcZkiH3IGubpNSvhlGJqSxNCQWT6XxkRVpm3Cez9UGulyjWqDqfqwkOPrEcWZ_7vcU220alWUU6OtPFZYvugVebrWacCeXfXbamZlXXYx'
 const RootQuery = new GraphQLObjectType({
@@ -30,8 +38,21 @@ const RootQuery = new GraphQLObjectType({
   fields: {
     AllBusinesses: {
       type: AllBusinessType,
+      args: {
+        price: {type: GraphQLString},
+        radius: {type: GraphQLInt},
+        latitude: {type: GraphQLFloat},
+        longitude: {type: GraphQLFloat}
+      },
       async resolve(parent, args) {
-        const {data} = await axios.get(url, {
+        let newUrl = url
+        console.log(args)
+        for (let key in args) {
+          newUrl += `&${key}=${args[key]}`
+        }
+
+        console.log(newUrl)
+        const {data} = await axios.get(newUrl, {
           headers: {Authorization: `Bearer ${apiKey}`}
         })
 
