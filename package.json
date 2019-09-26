@@ -1,5 +1,5 @@
 {
-  "name": "artiste",
+  "name": "eatery",
   "version": "2.0.0",
   "description": "Some boilerplate code to get you started - get shakin'!",
   "engines": {
@@ -41,7 +41,7 @@
   "author": "Fullstack Academy of Code",
   "license": "MIT",
   "dependencies": {
-    "@apollo/react-hooks": "^3.0.1",
+    "@apollo/react-hooks": "^3.1.1",
     "apollo-boost": "^0.4.4",
     "axios": "^0.19.0",
     "compression": "^1.7.3",
@@ -49,7 +49,8 @@
     "express": "^4.16.4",
     "express-graphql": "^0.9.0",
     "express-session": "^1.15.1",
-    "graphql": "^14.5.4",
+    "google-map-react": "^1.1.4",
+    "graphql": "^14.5.6",
     "graphql-tag": "^2.10.1",
     "history": "^4.9.0",
     "mapbox-gl": "^1.2.1",
@@ -59,7 +60,7 @@
     "pg": "^7.9.0",
     "pg-hstore": "^2.3.2",
     "prop-types": "^15.7.2",
-    "react": "^16.8.6",
+    "react": "^16.9.0",
     "react-apollo": "^3.0.1",
     "react-dom": "^16.8.6",
     "react-map-gl": "^5.0.10",
@@ -68,6 +69,7 @@
     "redux": "^4.0.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
+    "semantic-ui-react": "^0.88.1",
     "sequelize": "^5.3.1",
     "socket.io": "^2.2.0",
     "xml-js": "^1.6.11"

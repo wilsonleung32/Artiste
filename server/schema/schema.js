@@ -13,13 +13,23 @@ const CategoriesType = new GraphQLObjectType({
     title: {type: GraphQLString}
   })
 })
+const LocationType = new GraphQLObjectType({
+  name: 'Location',
+  fields: () => ({
+    city: {type: GraphQLString},
+    state: {type: GraphQLString},
+    address1: {type: GraphQLString},
+    zip_code: {type: GraphQLString}
+  })
+})
 const RestaurantType = new GraphQLObjectType({
   name: 'Restaurant',
   fields: () => ({
     price: {type: GraphQLString},
     id: {type: GraphQLString},
     name: {type: GraphQLString},
-    categories: {type: new GraphQLList(CategoriesType)}
+    categories: {type: new GraphQLList(CategoriesType)},
+    location: {type: LocationType}
   })
 })
 

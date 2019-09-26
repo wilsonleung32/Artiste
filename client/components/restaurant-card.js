@@ -1,24 +1,27 @@
 import React, {useState} from 'react'
-
+import {Card, Button, Modal} from 'semantic-ui-react'
 const restaurantCard = props => {
-  const [showCard, setShow] = useState(false)
   return (
-    <div>
-      {!showCard ? (
-        <button
-          type="button"
+    <Modal
+      trigger={
+        <Card
+          as={Button}
           onClick={() => {
-            setShow(true)
+            props.setShow(props.id)
           }}
+          disabled={props.cardId !== props.id && props.cardId}
         >
-          Reveal
-        </button>
-      ) : (
-        <div>
-          {props.price},{props.name}
-        </div>
-      )}
-    </div>
+          <Card.Content>?</Card.Content>
+        </Card>
+      }
+    >
+      <Modal.Content>
+        <Card.Content>
+          <Card.Meta>Price: {props.price}</Card.Meta>
+          <Card.Description>Name: {props.name}</Card.Description>
+        </Card.Content>
+      </Modal.Content>
+    </Modal>
   )
 }
 

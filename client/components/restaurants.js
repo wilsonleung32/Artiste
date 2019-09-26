@@ -4,6 +4,7 @@ import {Query} from 'react-apollo'
 import RestaurantCard from './restaurant-card'
 import {useLazyQuery} from '@apollo/react-hooks'
 
+import {Button, Form, Checkbox, Container} from 'semantic-ui-react'
 const RESTAURANTS_QUERY = gql`
   query RestaurantsQuery(
     $price: String
@@ -21,6 +22,11 @@ const RESTAURANTS_QUERY = gql`
         id
         name
         price
+        location {
+          city
+          state
+          address1
+        }
       }
     }
   }
@@ -35,14 +41,16 @@ const getRandom = array => {
   randomInts.forEach((val, key) => cards.push(array[key]))
   return cards
 }
-
+const dollarSign = '$$$$'
 const Restaurants = props => {
+  const [cards, setCards] = useState([])
+  const [cardId, setShow] = useState(false)
   const [getRestaurants, {loading, data}] = useLazyQuery(RESTAURANTS_QUERY)
 
   const [vars, setVars] = useState({
     radius: 3000,
-    longitude: null,
-    latitude: null
+    longitude: 40.7678,
+    latitude: 73.9645
   })
   const getLocation = position => {
     setVars({
@@ -53,9 +61,19 @@ const Restaurants = props => {
   }
   useEffect(() => {
     if (navigator.geolocation) {
+      console.log('here')
       navigator.geolocation.getCurrentPosition(getLocation)
     }
   }, [])
+  useEffect(
+    () => {
+      if (data) {
+        let arr = getRandom(data.AllBusinesses.businesses)
+        setCards([...arr])
+      }
+    },
+    [data]
+  )
   const [prices, setPrices] = useState([1, 2, 3, 4])
 
   const handleChange = price => {
@@ -65,67 +83,58 @@ const Restaurants = props => {
     } else {
       copy[price] = price + 1
     }
-
+    console.log(prices)
     setPrices(copy)
   }
-  let arr = []
-  if (loading) return <h2>loading</h2>
-  // if (error) console.log(error)
-  if (data) arr = getRandom(data.AllBusinesses.businesses)
-  console.log(vars.latitude)
-  return (
-    <div>
-      <div>
-        <input
-          type="checkbox"
-          name="$"
-          checked={prices[0]}
-          onChange={() => handleChange(0)}
-        />
-        <label htmlFor="$">$</label>
-        <input
-          type="checkbox"
-          name="$$"
-          checked={prices[1]}
-          onChange={() => handleChange(1)}
-        />
 
-        <label htmlFor="$$">$$</label>
-        <input
-          type="checkbox"
-          name="$$$"
-          checked={prices[2]}
-          onChange={() => handleChange(2)}
+  if (loading) return <h2>loading</h2>
+
+  return (
+    <Container>
+      <Form>
+        <Form.Group>
+          {prices.map((price, idx) => (
+            <Checkbox
+              key={idx}
+              label={dollarSign.slice(0, idx + 1)}
+              checked={Boolean(price)}
+              onChange={() => handleChange(idx)}
+            />
+          ))}
+          <Form.Input
+            label={`Radius: ${vars.radius}m`}
+            min={1000}
+            max={5000}
+            name="radius"
+            onChange={e => setVars({...vars, radius: Number(e.target.value)})}
+            step={100}
+            type="range"
+            value={vars.radius}
+          />
+          <Form.Button
+            onClick={() =>
+              getRestaurants({
+                variables: {
+                  ...vars,
+                  price: prices.filter(price => price !== false).join()
+                }
+              })
+            }
+            disabled={Boolean(cards.length)}
+          >
+            Query
+          </Form.Button>
+        </Form.Group>
+      </Form>
+      {cards.map(business => (
+        <RestaurantCard
+          key={business.id}
+          {...business}
+          setShow={setShow}
+          cardId={cardId}
         />
-        <label htmlFor="$$$">$$$</label>
-        <input
-          name="radius"
-          type="range"
-          min="1000"
-          max="5000"
-          value={vars.radius}
-          onChange={e => setVars({...vars, radius: Number(e.target.value)})}
-        />
-        <label htmlFor="radius">Max Distance: {vars.radius}</label>
-      </div>
-      {!data ? (
-        <button
-          type="button"
-          onClick={() =>
-            getRestaurants({
-              variables: {
-                ...vars,
-                price: prices.filter(price => price !== false).join()
-              }
-            })
-          }
-        >
-          Click
-        </button>
-      ) : (
-        arr.map(business => <RestaurantCard key={business.id} {...business} />)
-      )}
-    </div>
+      ))}
+    </Container>
   )
 }
 
