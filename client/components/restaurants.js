@@ -4,7 +4,7 @@ import {Query} from 'react-apollo'
 import RestaurantCard from './restaurant-card'
 import {useLazyQuery} from '@apollo/react-hooks'
 
-import {Button, Form, Checkbox, Container} from 'semantic-ui-react'
+import {Button, Form, Checkbox, Container, Card, Popup} from 'semantic-ui-react'
 const RESTAURANTS_QUERY = gql`
   query RestaurantsQuery(
     $price: String
@@ -34,7 +34,7 @@ const RESTAURANTS_QUERY = gql`
 const getRandom = array => {
   const cards = []
   const randomInts = new Set()
-  while (randomInts.size < 10) {
+  while (randomInts.size < 9) {
     const random = Math.floor(Math.random() * array.length)
     randomInts.add(random)
   }
@@ -43,14 +43,14 @@ const getRandom = array => {
 }
 const dollarSign = '$$$$'
 const Restaurants = props => {
-  const [cards, setCards] = useState([])
+  const [cards, setCards] = useState(new Array(9).fill({}))
   const [cardId, setShow] = useState(false)
   const [getRestaurants, {loading, data}] = useLazyQuery(RESTAURANTS_QUERY)
 
   const [vars, setVars] = useState({
-    radius: 3000,
-    longitude: 40.7678,
-    latitude: 73.9645
+    radius: 4023.36,
+    longitude: null,
+    latitude: null
   })
   const getLocation = position => {
     setVars({
@@ -61,7 +61,6 @@ const Restaurants = props => {
   }
   useEffect(() => {
     if (navigator.geolocation) {
-      console.log('here')
       navigator.geolocation.getCurrentPosition(getLocation)
     }
   }, [])
@@ -83,11 +82,9 @@ const Restaurants = props => {
     } else {
       copy[price] = price + 1
     }
-    console.log(prices)
+
     setPrices(copy)
   }
-
-  if (loading) return <h2>loading</h2>
 
   return (
     <Container>
@@ -102,38 +99,58 @@ const Restaurants = props => {
             />
           ))}
           <Form.Input
-            label={`Radius: ${vars.radius}m`}
-            min={1000}
-            max={5000}
+            label={`Radius: ${Math.ceil(2 * vars.radius * 0.00062137) / 2} mi`}
+            min={804.672}
+            max={8046.72}
             name="radius"
-            onChange={e => setVars({...vars, radius: Number(e.target.value)})}
-            step={100}
+            onChange={e =>
+              setVars({...vars, radius: Number(Math.ceil(e.target.value))})
+            }
+            step={804.672}
             type="range"
             value={vars.radius}
           />
+          <Popup
+            disabled={vars.latitude}
+            content="Location not set"
+            trigger={
+              <Form.Button
+                onClick={() =>
+                  getRestaurants({
+                    variables: {
+                      ...vars,
+                      price: prices.filter(price => price !== false).join()
+                    }
+                  })
+                }
+                disabled={Boolean(cards[0].id)}
+              >
+                Query
+              </Form.Button>
+            }
+          />
           <Form.Button
             onClick={() =>
-              getRestaurants({
-                variables: {
-                  ...vars,
-                  price: prices.filter(price => price !== false).join()
-                }
-              })
+              navigator.geolocation.getCurrentPosition(getLocation)
             }
-            disabled={Boolean(cards.length)}
           >
-            Query
+            {' '}
+            Get Location
           </Form.Button>
         </Form.Group>
       </Form>
-      {cards.map(business => (
-        <RestaurantCard
-          key={business.id}
-          {...business}
-          setShow={setShow}
-          cardId={cardId}
-        />
-      ))}
+
+      <Card.Group>
+        {cards.map((business, idx) => (
+          <RestaurantCard
+            key={business.id ? business.id : idx}
+            {...business}
+            loading={loading}
+            setShow={setShow}
+            cardId={cardId}
+          />
+        ))}
+      </Card.Group>
     </Container>
   )
 }
